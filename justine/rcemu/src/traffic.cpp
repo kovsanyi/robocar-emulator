@@ -224,8 +224,19 @@ void justine::robocar::Traffic::cmd_session ( boost::asio::ip::tcp::socket clien
                     {
                       if ( c->get_type() == CarType::GANGSTER )
                         {
+                          //**********
+                          int gangsterID {0};
+                          for( std::map<int, std::shared_ptr<justine::robocar::SmartCar>>::const_iterator i = m_smart_cars_map.begin(); i != m_smart_cars_map.end(); i++ )
+                          {
+                            if( i->second == c )
+                            {
+                              gangsterID = i->first;
+                              break;
+                            }
+                          }
+                          //**********
                           length += std::sprintf ( data+length,
-                                                   "<OK %d %u %u %u>", cl.get_id(), c->from(),
+                                                   "<OK %d %u %u %u>", gangsterID, c->from(),
                                                    c->to_node(), c->get_step() );
 
                           if ( length > network_buffer_size - 512 )
