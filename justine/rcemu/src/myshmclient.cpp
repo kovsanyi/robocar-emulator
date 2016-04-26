@@ -338,6 +338,17 @@ void justine::sampleclient::MyShmClient::start10 ( boost::asio::io_service& io_s
   unsigned int s {0u};
 
   std::vector<Gangster> gngstrs;
+  
+  //**********
+  int counter {0};
+  bool entered {false};
+  const int groupSize {2};
+  std::vector<int> targetIDs;
+  for( int i = 0; i < ( cops.size() / groupSize ) + 1; i++ )
+  {
+      targetIDs.push_back( -1 );
+  }
+  //***********
 
   for ( ;; )
     {
@@ -350,7 +361,39 @@ void justine::sampleclient::MyShmClient::start10 ( boost::asio::io_service& io_s
           gngstrs = gangsters ( socket, cop, t );
 
           if ( gngstrs.size() > 0 )
-            g = gngstrs[0].to;
+            //***********
+            {
+                if( counter == cops.size() )
+                {
+                    counter = 0;
+                }
+                if( targetIDs[ counter / groupSize ] == -1 )
+                {
+                    targetIDs[ counter / groupSize ] = gngstrs[0].id;
+                    g = gngstrs[0].to;
+                    ++counter;
+                }
+                else
+                {
+                    for( int i = 0; i < gngstrs.size(); i++ )
+                    {
+                        if( targetIDs[ counter / groupSize ] == gngstrs[i].id )
+                        {
+                            g = gngstrs[i].to;
+                            entered = true;
+                            break;
+                        }
+                    }
+                    if( !entered )
+                    {
+                        targetIDs[ counter / groupSize ] = -1;
+                    }
+                    entered = false;
+                    ++counter;
+                }
+            }
+            //***********
+            //g = gngstrs[0].to;
           else
             g = 0;
 
